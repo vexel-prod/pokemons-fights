@@ -1,4 +1,4 @@
-import type { Pokemon, StatusEffect } from '../../types/battle'
+import type { ArenaWeather, Pokemon, StatusEffect } from '../../types/battle'
 import { statusIcon } from '../../utils/statusEffects'
 import { getItemName } from '../../utils/items'
 
@@ -11,6 +11,19 @@ interface BattleHeaderProps {
     champ: StatusEffect | null
     opp: StatusEffect | null
   }
+  combo: {
+    champ: number
+    opp: number
+  }
+  rage: {
+    champ: number
+    opp: number
+  }
+  berserk: {
+    champ: number
+    opp: number
+  }
+  weather: ArenaWeather
   isMega: boolean
 }
 
@@ -20,6 +33,10 @@ export function BattleHeader({
   champHp,
   challengerHp,
   activeStatus,
+  combo,
+  rage,
+  berserk,
+  weather,
   isMega,
 }: BattleHeaderProps) {
   const champMaxHp = champ?.stats?.hp ?? 1
@@ -31,8 +48,24 @@ export function BattleHeader({
   }
 
   return (
-    <section className='shadow-[0px_0px_13px_-4px_rgba(0,0,0,0.4)] rounded-2xl p-10 border border-zinc-400/50'>
-      <div className='flex flex-col gap-3 items-center'>
+    <section className='battle-header-panel shadow-[0px_0px_18px_-2px_rgba(0,0,0,0.45)] rounded-2xl p-6 md:p-8 border border-zinc-300/40'>
+      <div className='flex flex-col gap-4 items-center'>
+        <div className='w-full flex items-center justify-between rounded-xl border border-zinc-300/40 bg-zinc-900/20 px-3 py-2 gap-3'>
+          <div className='text-xs md:text-sm font-semibold tracking-wide flex items-center gap-2'>
+            <span>{weather.icon}</span>
+            <span>{weather.name}</span>
+            <span className='opacity-70 hidden md:inline'>{weather.description}</span>
+          </div>
+          <div className='flex items-center gap-2 text-[11px] md:text-xs flex-wrap justify-end'>
+            <span className='combo-chip'>🔥 COMBO ЧЕМП: {combo.champ}</span>
+            <span className='combo-chip'>🔥 COMBO ОПП: {combo.opp}</span>
+            <span className='combo-chip'>⚡ RAGE: {Math.min(100, rage.champ)}%</span>
+            <span className='combo-chip'>⚡ RAGE OPP: {Math.min(100, rage.opp)}%</span>
+            {(berserk.champ > 0 || berserk.opp > 0) && (
+              <span className='combo-chip'>🔥 BERSERK {berserk.champ}:{berserk.opp}</span>
+            )}
+          </div>
+        </div>
         <div className='flex justify-between w-full items-center gap-10'>
           <div className='w-full flex flex-col items-center justify-center'>
             <div className='flex items-center justify-center gap-2'>

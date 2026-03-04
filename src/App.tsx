@@ -1,4 +1,5 @@
-import './App.css'
+'use client'
+
 import PokemonArena from './components/PokemonArena'
 
 export default function App() {

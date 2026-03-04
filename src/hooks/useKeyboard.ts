@@ -5,6 +5,7 @@ interface KeyboardOptions {
   onShield: () => void
   onHeal: () => void
   onCounter: () => void
+  onBerserk: () => void
   onMega: () => void
   canMega: boolean
   megaUsed: boolean
@@ -16,6 +17,7 @@ export function useKeyboard({
   onShield,
   onHeal,
   onCounter,
+  onBerserk,
   onMega,
   canMega,
   megaUsed,
@@ -43,6 +45,11 @@ export function useKeyboard({
         keyName = 'counter'
         onCounter()
       }
+      if (event.key === '4' || event.key === 'r' || event.key === 'R' || event.key === 'р') {
+        event.preventDefault()
+        keyName = 'berserk'
+        onBerserk()
+      }
       if (event.key === 'm' || event.key === 'M' || event.key === ' ' || event.key === 'ь') {
         event.preventDefault()
         keyName = 'mega'
@@ -57,5 +64,5 @@ export function useKeyboard({
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [isFighting, canMega, megaUsed, onShield, onHeal, onCounter, onMega, setPressedKey])
+  }, [isFighting, canMega, megaUsed, onShield, onHeal, onCounter, onBerserk, onMega, setPressedKey])
 }

@@ -1,4 +1,11 @@
-import { useCallback, useRef, useState, type Dispatch, type SetStateAction } from 'react'
+import {
+  useCallback,
+  useRef,
+  useState,
+  type Dispatch,
+  type RefObject,
+  type SetStateAction,
+} from 'react'
 import type { LogEntry, LogTone } from '../types/battle'
 import { clamp } from '../utils/helpers'
 
@@ -10,7 +17,7 @@ interface UseBattleLogResult {
   setPage: Dispatch<SetStateAction<number>>
   appendLog: (text: string, tone?: LogTone) => void
   clearLog: () => void
-  logScrollRef: React.RefObject<HTMLDivElement | null>
+  logScrollRef: RefObject<HTMLDivElement | null>
 }
 
 export function useBattleLog(logsPerPage = 10): UseBattleLogResult {

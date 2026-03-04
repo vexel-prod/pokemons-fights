@@ -12,6 +12,10 @@ interface BattleControlsProps {
   onShield: () => void
   onHeal: () => void
   onCounter: () => void
+  onBerserk: () => void
+  canBerserk: boolean
+  rage: number
+  berserkTurns: number
   canMega: boolean
   megaUsed: boolean
   onMega: () => void
@@ -25,6 +29,10 @@ export function BattleControls({
   onShield,
   onHeal,
   onCounter,
+  onBerserk,
+  canBerserk,
+  rage,
+  berserkTurns,
   canMega,
   megaUsed,
   onMega,
@@ -33,7 +41,7 @@ export function BattleControls({
   pressedKey,
 }: BattleControlsProps) {
   return (
-    <div className='flex items-center gap-2 mb-3 p-2 bg-zinc-800/30 rounded-lg border border-zinc-400/30'>
+    <div className='flex items-center gap-2 mb-3 p-2 bg-zinc-800/30 rounded-lg border border-zinc-400/30 flex-wrap'>
       <button
         onClick={onShield}
         disabled={!activeAbilities.shield.available}
@@ -83,6 +91,22 @@ export function BattleControls({
         </span>
         ⚔️ Контр
         {!activeAbilities.counter.available && ` (${activeAbilities.counter.cooldown})`}
+      </button>
+
+      <button
+        onClick={onBerserk}
+        disabled={!canBerserk}
+        className={`flex-1 px-2 py-2 text-xs font-bold rounded transition relative ${
+          canBerserk
+            ? 'bg-amber-500/80 hover:bg-amber-400/80 text-zinc-950'
+            : 'bg-zinc-600/50 text-zinc-400 cursor-not-allowed'
+        } ${pressedKey === 'berserk' ? 'ring-2 ring-white scale-95' : ''}`}
+        title='Берсерк: 2 хода усиленного урона и вампиризма (клавиша 4 или R)'
+      >
+        <span className='absolute -top-2 -left-1 bg-zinc-900 border border-zinc-500 rounded px-1 text-[10px] opacity-80'>
+          4
+        </span>
+        🔥 Берсерк {berserkTurns > 0 ? `(${berserkTurns})` : `[${rage}%]`}
       </button>
 
       {canMega && !megaUsed && (

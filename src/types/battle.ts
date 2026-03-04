@@ -54,11 +54,21 @@ export interface StatusEffect {
 export interface BattleState {
   turn: number
   tempo: Record<BattleSide, number>
+  combo: Record<BattleSide, number>
   shield: Record<BattleSide, number>
   status: Record<BattleSide, StatusEffect | null>
   sashUsed: boolean
   berryUsed: boolean
   counterActive: boolean
+}
+
+export type ArenaWeatherKind = 'CLEAR' | 'SUN' | 'RAIN' | 'STORM' | 'MIST'
+
+export interface ArenaWeather {
+  kind: ArenaWeatherKind
+  name: string
+  icon: string
+  description: string
 }
 
 export interface DamageItemEffect {

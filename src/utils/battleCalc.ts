@@ -17,6 +17,7 @@ export const applyShieldAbsorb = (
 export const initBattleState = (): BattleState => ({
   turn: 0,
   tempo: { champ: 0, opp: 0 },
+  combo: { champ: 0, opp: 0 },
   shield: { champ: 0, opp: 0 },
   status: { champ: null, opp: null },
   sashUsed: false,

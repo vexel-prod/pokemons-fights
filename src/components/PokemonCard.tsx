@@ -94,6 +94,12 @@ export default function PokemonCard({ pokemon }: PokemonCardProps) {
       ? 'MYTHICAL'
       : 'GOLD'
 
+  const rarityClass = pokemon.isLegendary
+    ? 'pokemon-card-legendary'
+    : pokemon.isMythical
+      ? 'pokemon-card-mythical'
+      : 'pokemon-card-standard'
+
   const statConfig = [
     { label: 'HP:', key: 'hp', tone: 'hp' },
     { label: 'ATK:', key: 'attack', tone: 'atk' },
@@ -109,79 +115,81 @@ export default function PokemonCard({ pokemon }: PokemonCardProps) {
 
   return (
     <div
-      className={`h-123.25 border-2 overflow-hidden rounded-2xl p-4 shadow-[0px_0px_13px_-4px_rgba(0,0,0,0.4)] ${
-        pokemon.isLegendary
-          ? 'border-yellow-300 bg-linear-to-bl from-amber-500 to-yellow-100 shadow-[0px_0px_13px_2px_rgba(255,220,46,1)]'
-          : pokemon.isMythical
-            ? 'border-purple-300 bg-linear-to-bl from-violet-500 to-fuchsia-100 shadow-[0px_0px_13px_2px_rgba(255,46,248,1)]'
-            : 'border-zinc-400/50 bg-linear-to-bl from-white-200 to-zinc-200'
-      }`}
+      className={`pokemon-card-3d h-123.25 overflow-hidden rounded-2xl p-4 ${rarityClass}`}
     >
-      <div className='flex justify-between'>
-        <div className='flex flex-col gap-2 relative'>
-          <div className='flex gap-2 overflow-clip'>
-            <h2 className='max-w-35 text-xl font-black tracking-wide truncate drop-shadow leading-none'>
-              {pokemon.name.toUpperCase()}
-            </h2>
+      <div className='pokemon-card-noise' aria-hidden />
+      <div className='pokemon-card-specular' aria-hidden />
+      <div className='pokemon-card-rim' aria-hidden />
 
-            <span className='text-xs font-bold opacity-80'>#{String(pokemon.id).padStart(3, '0')}</span>
+      <div className='pokemon-card-inner'>
+        <div className='flex justify-between'>
+          <div className='flex flex-col gap-2 relative'>
+            <div className='flex gap-2 overflow-clip items-center'>
+              <h2 className='max-w-35 text-xl font-black tracking-wide truncate drop-shadow leading-none text-zinc-100'>
+                {pokemon.name.toUpperCase()}
+              </h2>
+
+              <span className='pokemon-id-pill'>#{String(pokemon.id).padStart(3, '0')}</span>
+            </div>
+            <div className='flex flex-col gap-1'>
+              {(pokemon.types ?? []).map(type => (
+                <span
+                  key={type}
+                  className={[
+                    'border border-zinc-300/40 badge badge-sm font-extrabold tracking-wide',
+                    typeBadge[type] ?? 'badge-primary',
+                  ].join(' ')}
+                >
+                  {typeBadgeIcon[type]} {String(type).toUpperCase()}
+                </span>
+              ))}
+            </div>
           </div>
-          <div className='flex flex-col gap-1'>
-            {(pokemon.types ?? []).map(type => (
-              <span
-                key={type}
-                className={[
-                  'border border-zinc-400/50 badge badge-sm font-extrabold tracking-wide',
-                  typeBadge[type] ?? 'badge-primary',
-                ].join(' ')}
-              >
-                {typeBadgeIcon[type]} {String(type).toUpperCase()}
-              </span>
-            ))}
+
+          <div className='flex flex-col gap-2'>
+            {(pokemon.isLegendary || pokemon.isMythical) && (
+              <div className='badge badge-sm bg-white/90 text-zinc-900 font-extrabold tracking-wide border border-zinc-300/60 shadow-sm'>
+                <span className='skeleton skeleton-text'>{uniquenessLabel}</span>
+              </div>
+            )}
           </div>
         </div>
 
-        <div className='flex flex-col gap-2'>
-          {(pokemon.isLegendary || pokemon.isMythical) && (
-            <div className='badge badge-sm bg-white/80 font-extrabold tracking-wide border border-zinc-400/50'>
-              <span className='skeleton skeleton-text'>{uniquenessLabel}</span>
-            </div>
-          )}
-        </div>
-      </div>
-
-      <div className='flex flex-col items-center'>
-        {pokemon.image ? (
-          <img
-            src={pokemon.image}
-            alt={pokemon.name}
-            className='w-60 h-full object-center'
-            loading='lazy'
-          />
-        ) : (
-          <div className='text-xs opacity-60 p-4'>No image</div>
-        )}
-
-        <div className='w-full text-zinc-800'>
-          <div className='flex justify-between text-[11px] font-black tracking-widest opacity-80 mb-2'>
-            <div>
-              POWER METER: <span>{totalStats}</span>
-            </div>
-            <div>
-              BASE EXP: <span>{pokemon.baseExp}</span>
-            </div>
-          </div>
-
-          <div className='grid gap-1'>
-            {statConfig.map(stat => (
-              <StatBar
-                key={stat.key}
-                label={stat.label}
-                value={pokemon.stats?.[stat.key] ?? 0}
-                max={200}
-                tone={stat.tone}
+        <div className='flex flex-col items-center gap-2'>
+          <div className='pokemon-sprite-wrap'>
+            {pokemon.image ? (
+              <img
+                src={pokemon.image}
+                alt={pokemon.name}
+                className='pokemon-sprite-3d object-contain'
+                loading='lazy'
               />
-            ))}
+            ) : (
+              <div className='text-xs opacity-60 p-4'>No image</div>
+            )}
+          </div>
+
+          <div className='w-full pokemon-stats-panel'>
+            <div className='flex justify-between text-[11px] font-black tracking-widest opacity-90 mb-2 text-zinc-100'>
+              <div>
+                POWER METER: <span>{totalStats}</span>
+              </div>
+              <div>
+                BASE EXP: <span>{pokemon.baseExp}</span>
+              </div>
+            </div>
+
+            <div className='grid gap-1'>
+              {statConfig.map(stat => (
+                <StatBar
+                  key={stat.key}
+                  label={stat.label}
+                  value={pokemon.stats?.[stat.key] ?? 0}
+                  max={200}
+                  tone={stat.tone}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </div>

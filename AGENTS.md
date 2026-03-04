@@ -1,19 +1,20 @@
 # AGENTS.md
 
 ## Project Overview
-- Stack: `React 19` + `Vite` + `TypeScript` + `TailwindCSS v4` + `daisyUI`.
-- Entry point: `src/main.tsx`.
+- Stack: `Next.js 16` (App Router) + `React 19` + `TypeScript` + `TailwindCSS v4` + `daisyUI`.
+- App entry: `src/app/layout.tsx` + `src/app/page.tsx`.
 - Main screen: `src/components/PokemonArena.tsx`.
 - Battle/domain types: `src/types/battle.ts`.
 
 ## Commands
-- Install deps: `npm install`
-- Dev server: `npm run dev`
-- Lint + typecheck: `npm run lint`
-- Typecheck only: `npm run typecheck`
-- Production build: `npm run build`
+- Install deps: `bun install`
+- Dev server: `bun run dev`
+- Lint + typecheck: `bun run lint`
+- Typecheck only: `bun run typecheck`
+- Production build: `bun run build`
+- Production start: `bun run start`
 
-Always run `npm run lint` and `npm run build` after non-trivial changes.
+Always run `bun run lint` and `bun run build` after non-trivial changes.
 
 ## Code Structure
 - `src/api/*`: API mapping and fetch helpers (`poke.ts`).
@@ -41,7 +42,7 @@ Always run `npm run lint` and `npm run build` after non-trivial changes.
 - Keep mobile/desktop behavior intact when editing layout classes.
 
 ## Safety Checklist Before Finish
-1. `npm run lint` passes.
-2. `npm run build` passes.
+1. `bun run lint` passes.
+2. `bun run build` passes.
 3. No dead imports/functions left.
 4. No duplicated constants/logic introduced.

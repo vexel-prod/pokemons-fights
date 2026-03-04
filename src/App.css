@@ -25,6 +25,12 @@ body,
 
 body {
   overflow-y: auto;
+  background:
+    radial-gradient(circle at 18% 16%, rgba(255, 173, 85, 0.32), transparent 34%),
+    radial-gradient(circle at 86% 24%, rgba(80, 157, 255, 0.26), transparent 36%),
+    radial-gradient(circle at 50% 110%, rgba(177, 107, 255, 0.22), transparent 35%),
+    linear-gradient(165deg, #0f1218 0%, #161923 52%, #0f1118 100%);
+  color: #f2f5ff;
 }
 
 @keyframes fadeIn {
@@ -86,6 +92,77 @@ body {
   animation: pop 0.3s ease forwards;
 }
 
+@keyframes arenaFloat {
+  0% {
+    transform: translateY(0px) translateX(0px);
+  }
+  50% {
+    transform: translateY(-8px) translateX(6px);
+  }
+  100% {
+    transform: translateY(0px) translateX(0px);
+  }
+}
+
+@keyframes arenaScan {
+  0% {
+    transform: translateY(-25%);
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(125%);
+    opacity: 0.2;
+  }
+}
+
+@keyframes cardHit {
+  0% {
+    transform: translateX(0) scale(1);
+    filter: brightness(1);
+  }
+  35% {
+    transform: translateX(-5px) scale(1.01);
+    filter: brightness(1.45);
+  }
+  70% {
+    transform: translateX(4px) scale(1.01);
+    filter: brightness(1.15);
+  }
+  100% {
+    transform: translateX(0) scale(1);
+    filter: brightness(1);
+  }
+}
+
+@keyframes holoSweep {
+  0% {
+    transform: translateX(-140%) rotate(18deg);
+    opacity: 0.05;
+  }
+  40% {
+    opacity: 0.22;
+  }
+  100% {
+    transform: translateX(170%) rotate(18deg);
+    opacity: 0.08;
+  }
+}
+
+@keyframes cardFloat {
+  0% {
+    transform: translateY(0px) translateZ(0px);
+  }
+  50% {
+    transform: translateY(-2px) translateZ(6px);
+  }
+  100% {
+    transform: translateY(0px) translateZ(0px);
+  }
+}
+
 /* Плавность полосок HP */
 .hp-bar-track {
   transform: translateZ(0);
@@ -96,10 +173,341 @@ body {
   will-change: width;
 }
 
+.arena-scene {
+  position: relative;
+  isolation: isolate;
+}
+
+.arena-parallax {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.arena-glow {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 50% 40%, rgba(75, 144, 255, 0.24), transparent 42%),
+    radial-gradient(circle at 52% 80%, rgba(255, 111, 67, 0.16), transparent 36%);
+  filter: blur(8px);
+}
+
+.arena-grid {
+  position: absolute;
+  inset: -20%;
+  background:
+    linear-gradient(transparent 0 95%, rgba(140, 166, 255, 0.1) 100%),
+    linear-gradient(90deg, transparent 0 95%, rgba(140, 166, 255, 0.06) 100%);
+  background-size: 38px 38px;
+  mask-image: radial-gradient(circle at 50% 45%, black 15%, transparent 75%);
+  animation: arenaFloat 14s ease-in-out infinite;
+}
+
+.arena-particles {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 35%, rgba(255, 255, 255, 0.22) 0 2px, transparent 3px),
+    radial-gradient(circle at 75% 44%, rgba(255, 255, 255, 0.19) 0 2px, transparent 3px),
+    radial-gradient(circle at 48% 72%, rgba(255, 255, 255, 0.16) 0 1px, transparent 2px),
+    radial-gradient(circle at 58% 24%, rgba(255, 255, 255, 0.2) 0 1px, transparent 2px);
+  animation: arenaFloat 8s ease-in-out infinite;
+}
+
+.battle-header-panel {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02)),
+    radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.08), transparent 45%),
+    rgba(24, 27, 37, 0.62);
+  backdrop-filter: blur(8px);
+}
+
+.combo-chip {
+  border: 1px solid rgba(255, 196, 115, 0.45);
+  border-radius: 9999px;
+  padding: 2px 10px;
+  background: linear-gradient(120deg, rgba(255, 171, 60, 0.25), rgba(255, 103, 47, 0.22));
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.battle-console {
+  background:
+    linear-gradient(150deg, rgba(38, 43, 57, 0.82), rgba(17, 19, 27, 0.82)),
+    radial-gradient(circle at 50% -30%, rgba(126, 157, 255, 0.25), transparent 60%);
+  backdrop-filter: blur(10px);
+}
+
+.battle-card-frame {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  --card-rx: 0deg;
+  --card-ry: 0deg;
+  --card-mx: 50%;
+  --card-my: 30%;
+}
+
+.battle-card-tilt {
+  perspective: 1400px;
+  transform-style: preserve-3d;
+}
+
+.battle-card-tilt > :nth-child(2) {
+  transform:
+    rotateX(var(--card-rx))
+    rotateY(var(--card-ry))
+    translateZ(8px)
+    scale(1.01);
+  transition: transform 180ms ease-out;
+  will-change: transform;
+}
+
+.battle-card-tilt:hover > :nth-child(2) {
+  box-shadow:
+    0 24px 30px -24px rgba(0, 0, 0, 0.88),
+    0 16px 24px -18px rgba(40, 111, 255, 0.3);
+}
+
+.battle-card-glare {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: 1rem;
+  z-index: 4;
+  opacity: 0.5;
+  background:
+    radial-gradient(
+      220px circle at var(--card-mx) var(--card-my),
+      rgba(255, 255, 255, 0.22),
+      rgba(255, 255, 255, 0.04) 35%,
+      transparent 62%
+    ),
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.1),
+      transparent 22%,
+      transparent 60%,
+      rgba(255, 255, 255, 0.08)
+    );
+  mix-blend-mode: screen;
+}
+
+.battle-card-hit {
+  animation: cardHit 240ms ease-out;
+}
+
+.battle-card-frame::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 1rem;
+  pointer-events: none;
+  opacity: 0.58;
+  transition: opacity 0.3s ease;
+}
+
+.arena-aura-clear::after {
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.arena-aura-sun::after {
+  box-shadow:
+    0 0 18px rgba(255, 168, 72, 0.35),
+    inset 0 0 0 1px rgba(255, 206, 143, 0.4);
+}
+
+.arena-aura-rain::after {
+  box-shadow:
+    0 0 18px rgba(87, 158, 255, 0.35),
+    inset 0 0 0 1px rgba(122, 182, 255, 0.4);
+}
+
+.arena-aura-storm::after {
+  box-shadow:
+    0 0 18px rgba(167, 139, 250, 0.4),
+    inset 0 0 0 1px rgba(180, 154, 255, 0.45);
+}
+
+.arena-aura-mist::after {
+  box-shadow:
+    0 0 18px rgba(172, 195, 216, 0.32),
+    inset 0 0 0 1px rgba(198, 218, 235, 0.35);
+}
+
+.weather-sun .arena-glow {
+  filter: blur(10px) saturate(1.2);
+}
+
+.weather-rain .arena-particles {
+  opacity: 0.75;
+}
+
+.weather-storm .arena-grid {
+  animation-duration: 7s;
+}
+
+.weather-mist .arena-parallax::before {
+  content: '';
+  position: absolute;
+  inset: -20%;
+  background: linear-gradient(180deg, transparent, rgba(220, 236, 255, 0.09), transparent);
+  animation: arenaScan 8s linear infinite;
+}
+
+.pokemon-card-3d {
+  position: relative;
+  border: 1px solid rgba(199, 205, 233, 0.4);
+  box-shadow:
+    0 18px 30px -20px rgba(0, 0, 0, 0.9),
+    0 6px 12px -8px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  transform-style: preserve-3d;
+  background: linear-gradient(150deg, rgba(20, 23, 33, 0.88), rgba(11, 13, 19, 0.88));
+}
+
+.pokemon-card-inner {
+  position: relative;
+  z-index: 3;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 10px;
+  padding-bottom: 6px;
+  transform: translateZ(16px);
+}
+
+.pokemon-card-rim,
+.pokemon-card-noise,
+.pokemon-card-specular {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: 1rem;
+}
+
+.pokemon-card-rim {
+  z-index: 1;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+    inset 0 -30px 55px rgba(0, 0, 0, 0.45);
+}
+
+.pokemon-card-noise {
+  z-index: 0;
+  opacity: 0.14;
+  background-image:
+    radial-gradient(circle at 18% 24%, rgba(255, 255, 255, 0.4) 0 0.5px, transparent 1px),
+    radial-gradient(circle at 72% 62%, rgba(255, 255, 255, 0.36) 0 0.5px, transparent 1px),
+    radial-gradient(circle at 54% 82%, rgba(255, 255, 255, 0.28) 0 0.5px, transparent 1px);
+  background-size: 3px 3px, 4px 4px, 5px 5px;
+}
+
+.pokemon-card-specular {
+  z-index: 2;
+  overflow: hidden;
+}
+
+.pokemon-card-specular::before {
+  content: '';
+  position: absolute;
+  inset: -30% -60%;
+  background: linear-gradient(
+    95deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.23) 44%,
+    rgba(255, 255, 255, 0.05) 52%,
+    rgba(255, 255, 255, 0) 64%
+  );
+  animation: holoSweep 5.8s ease-in-out infinite;
+}
+
+.pokemon-card-legendary {
+  background:
+    radial-gradient(circle at 22% 18%, rgba(255, 231, 137, 0.32), transparent 34%),
+    linear-gradient(160deg, rgba(120, 82, 24, 0.88), rgba(49, 32, 10, 0.94));
+  border-color: rgba(255, 228, 134, 0.6);
+}
+
+.pokemon-card-mythical {
+  background:
+    radial-gradient(circle at 80% 10%, rgba(255, 160, 255, 0.26), transparent 34%),
+    linear-gradient(160deg, rgba(82, 35, 123, 0.9), rgba(32, 14, 59, 0.94));
+  border-color: rgba(225, 176, 255, 0.58);
+}
+
+.pokemon-card-standard {
+  background:
+    radial-gradient(circle at 22% 6%, rgba(147, 182, 255, 0.2), transparent 28%),
+    linear-gradient(155deg, rgba(35, 42, 63, 0.92), rgba(16, 19, 31, 0.95));
+  border-color: rgba(163, 178, 220, 0.52);
+}
+
+.pokemon-id-pill {
+  border: 1px solid rgba(211, 222, 255, 0.38);
+  border-radius: 9999px;
+  padding: 1px 8px;
+  font-size: 11px;
+  font-weight: 800;
+  color: rgba(244, 248, 255, 0.9);
+  background: linear-gradient(150deg, rgba(90, 107, 153, 0.6), rgba(47, 54, 82, 0.7));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+.pokemon-sprite-3d {
+  width: min(100%, 230px);
+  height: 100%;
+  transform: translateZ(28px);
+  filter:
+    drop-shadow(0 10px 8px rgba(0, 0, 0, 0.35))
+    drop-shadow(0 0 12px rgba(255, 255, 255, 0.08));
+  animation: cardFloat 3.2s ease-in-out infinite;
+}
+
+.pokemon-sprite-wrap {
+  width: 100%;
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 2px;
+  padding-bottom: 2px;
+}
+
+.pokemon-stats-panel {
+  border: 1px solid rgba(200, 214, 255, 0.24);
+  border-radius: 0.9rem;
+  padding: 10px;
+  background:
+    linear-gradient(150deg, rgba(10, 14, 24, 0.6), rgba(35, 42, 62, 0.42)),
+    radial-gradient(circle at 10% 0%, rgba(167, 191, 255, 0.16), transparent 45%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    0 6px 16px -10px rgba(0, 0, 0, 0.7);
+  transform: translateZ(18px);
+  margin-top: 2px;
+}
+
 /* Если пользователь предпочитает меньше анимаций */
 @media (prefers-reduced-motion: reduce) {
   .hp-bar-fill {
     transition: none;
+  }
+
+  .arena-grid,
+  .arena-particles,
+  .weather-mist .arena-parallax::before,
+  .battle-card-hit,
+  .pokemon-card-specular::before,
+  .pokemon-sprite-3d {
+    animation: none !important;
+  }
+
+  .battle-card-tilt > :nth-child(2) {
+    transform: none !important;
   }
 }
 

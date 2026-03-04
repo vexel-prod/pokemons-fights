@@ -1,4 +1,12 @@
-import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import {
+  useCallback,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type Dispatch,
+  type SetStateAction,
+} from 'react'
 import { BattleCard, BattleControls, BattleHeader, BattleLog } from './Battle'
 import { useKeyboard } from '../hooks/useKeyboard'
 import { useBattleLog } from '../hooks/useBattleLog'
@@ -7,12 +15,25 @@ import { clamp, delay } from '../utils/helpers'
 import { statusIcon, statusName, tickStatus, trySkipTurnByStatus } from '../utils/statusEffects'
 import { applyShieldAbsorb, calcDamage, initBattleState } from '../utils/battleCalc'
 import { fetchPokemon, getRandomPokemonId } from '../api/poke'
-import type { BattleSide, BattleState, Item, LogTone, Pokemon, StatusEffect } from '../types/battle'
+import type {
+  ArenaWeather,
+  BattleSide,
+  BattleState,
+  Item,
+  LogTone,
+  Pokemon,
+  StatusEffect,
+} from '../types/battle'
 
 interface ActiveAbilities {
   shield: { available: boolean; cooldown: number }
   heal: { available: boolean; cooldown: number }
   counter: { available: boolean; cooldown: number }
+}
+
+interface BerserkState {
+  champ: number
+  opp: number
 }
 
 const makeDefaultAbilities = (): ActiveAbilities => ({
@@ -22,6 +43,17 @@ const makeDefaultAbilities = (): ActiveAbilities => ({
 })
 
 const formatLine = (parts: Array<string | null | undefined>): string => parts.filter(Boolean).join('  ')
+
+const ARENA_WEATHERS: ArenaWeather[] = [
+  { kind: 'CLEAR', name: 'Ясное небо', icon: '🌤️', description: 'Нейтральная арена без модификаторов' },
+  { kind: 'SUN', name: 'Палящее солнце', icon: '☀️', description: 'Огонь усиливается, вода ослабевает' },
+  { kind: 'RAIN', name: 'Ливень', icon: '🌧️', description: 'Вода усиливается, огонь ослабевает' },
+  { kind: 'STORM', name: 'Грозовой фронт', icon: '⛈️', description: 'Шанс электрического всплеска урона' },
+  { kind: 'MIST', name: 'Мистический туман', icon: '🌫️', description: 'Магические атаки получают бонус' },
+]
+
+const pickWeather = (): ArenaWeather =>
+  ARENA_WEATHERS[Math.floor(Math.random() * ARENA_WEATHERS.length)]
 
 export default function PokemonArena() {
   const { count, champ, challenger, setChamp, setChallenger } = usePokemon()
@@ -44,6 +76,11 @@ export default function PokemonArena() {
   const [isMega, setIsMega] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [logMaxHeight, setLogMaxHeight] = useState<number | null>(null)
+  const [weather, setWeather] = useState<ArenaWeather>(ARENA_WEATHERS[0])
+  const [impactSide, setImpactSide] = useState<BattleSide | null>(null)
+  const [comboMeter, setComboMeter] = useState<Record<BattleSide, number>>({ champ: 0, opp: 0 })
+  const [rageMeter, setRageMeter] = useState<Record<BattleSide, number>>({ champ: 0, opp: 0 })
+  const [berserkTurns, setBerserkTurns] = useState<BerserkState>({ champ: 0, opp: 0 })
 
   const battleStateRef = useRef<BattleState>(initBattleState())
   const fightTokenRef = useRef(0)
@@ -101,9 +138,40 @@ export default function PokemonArena() {
     setCanMega(false)
     setIsMega(false)
     setMegaUsed(false)
+    setWeather(ARENA_WEATHERS[0])
+    setImpactSide(null)
+    setComboMeter({ champ: 0, opp: 0 })
+    setRageMeter({ champ: 0, opp: 0 })
+    setBerserkTurns({ champ: 0, opp: 0 })
     fightNoRef.current = 0
     battleStateRef.current = initBattleState()
   }, [clearLog])
+
+  const activateBerserk = useCallback(
+    (side: BattleSide, source: 'user' | 'auto' = 'user') => {
+      setRageMeter(prev => {
+        if ((prev[side] ?? 0) < 100) return prev
+        const next = { ...prev, [side]: Math.max(0, prev[side] - 100) }
+        setBerserkTurns(turns => {
+          if (turns[side] > 0) return turns
+          const updated = { ...turns, [side]: 2 }
+          const who = side === 'champ' ? 'ЧЕМПИОН' : 'ОППОНЕНТ'
+          const icon = side === 'champ' ? '🔥' : '⚡'
+          appendLog(
+            formatLine([
+              icon,
+              `${who} входит в БЕРСЕРК на 2 хода!`,
+              source === 'auto' ? 'Авто-активация ярости.' : null,
+            ]),
+            'good',
+          )
+          return updated
+        })
+        return next
+      })
+    },
+    [appendLog],
+  )
 
   const getStatusLine = (side: BattleSide): string | null => {
     const state = battleStateRef.current.status[side]
@@ -170,6 +238,7 @@ export default function PokemonArena() {
     onShield: () => handleActivateAbility('shield'),
     onHeal: () => handleActivateAbility('heal'),
     onCounter: () => handleActivateAbility('counter'),
+    onBerserk: () => activateBerserk('champ'),
     onMega: handleMega,
     canMega,
     megaUsed,
@@ -195,9 +264,12 @@ export default function PokemonArena() {
 
       const canMegaEvolve = Math.random() < 0.4
       setCanMega(canMegaEvolve)
+      const localWeather = pickWeather()
+      setWeather(localWeather)
       if (canMegaEvolve) {
         appendLog(formatLine(['🦖', `${champion.name.toUpperCase()} может мега-эволюционировать!`]), 'good')
       }
+      appendLog(formatLine([localWeather.icon, `Арена: ${localWeather.name}.`, localWeather.description]), 'meta')
 
       appendLog(formatLine(['✅', 'Подготовка завершена.']), 'good')
       appendLog(formatLine(['🏆', 'Чемпион:', champion.name.toUpperCase()]))
@@ -238,8 +310,15 @@ export default function PokemonArena() {
       setCanMega(false)
       setIsMega(false)
       setMegaUsed(false)
+      setImpactSide(null)
+      setComboMeter({ champ: 0, opp: 0 })
+      setRageMeter({ champ: 0, opp: 0 })
+      setBerserkTurns({ champ: 0, opp: 0 })
+      const localWeather = pickWeather()
+      setWeather(localWeather)
 
       appendLog(formatLine(['✅', 'Новый оппонент:', opponent.name.toUpperCase()]), 'good')
+      appendLog(formatLine([localWeather.icon, `Арена: ${localWeather.name}.`, localWeather.description]), 'meta')
       if (opponent.item?.name && opponent.item.name !== 'none') {
         appendLog(formatLine(['🎒', `Предмет: ${opponent.item.name.replace(/-/g, ' ')}`]), 'meta')
       }
@@ -264,6 +343,13 @@ export default function PokemonArena() {
     setActiveAbilities(makeDefaultAbilities())
     setMegaUsed(false)
     setIsMega(false)
+    setImpactSide(null)
+    setComboMeter({ champ: 0, opp: 0 })
+    setRageMeter({ champ: 0, opp: 0 })
+    setBerserkTurns({ champ: 0, opp: 0 })
+
+    const localWeather = pickWeather()
+    setWeather(localWeather)
 
     const localChamp = champ
     const localOpp = challenger
@@ -277,7 +363,7 @@ export default function PokemonArena() {
       side: BattleSide,
       hp: number,
       maxHp: number,
-      setHp: React.Dispatch<React.SetStateAction<number>>,
+      setHp: Dispatch<SetStateAction<number>>,
       whoNameUpper: string,
       item: Item,
     ): number => {
@@ -361,13 +447,21 @@ export default function PokemonArena() {
       const atkStatus = battleStateRef.current.status[atkSide]
       const skip = trySkipTurnByStatus(atkStatus)
       if (skip.skip) {
+        battleStateRef.current.combo[atkSide] = 0
+        setComboMeter({ ...battleStateRef.current.combo })
         appendLog(formatLine(['⛔', `${attacker.name.toUpperCase()} НЕ МОЖЕТ атаковать — ${skip.reason}!`]), 'bad')
         return { defHp: getDefHp(), atkHp: getAtkHp(), stopped: false }
+      }
+
+      if (atkSide === 'opp' && rageMeter.opp >= 100 && berserkTurns.opp <= 0 && Math.random() < 0.7) {
+        activateBerserk('opp', 'auto')
       }
 
       const result = calcDamage(attacker, defender, battleStateRef.current, atkSide)
 
       if (result.kind === 'MISS') {
+        battleStateRef.current.combo[atkSide] = 0
+        setComboMeter({ ...battleStateRef.current.combo })
         appendLog(
           formatLine([
             '🥷',
@@ -398,7 +492,47 @@ export default function PokemonArena() {
       const { dmgAfter, shieldAfter, absorbed } = applyShieldAbsorb(result.dmg, shieldBefore)
       battleStateRef.current.shield[defSide] = shieldAfter
 
-      const finalDamage = dmgAfter
+      let finalDamage = dmgAfter
+      let weatherTag: string | null = null
+      if (localWeather.kind === 'SUN') {
+        if (result.attackType === 'fire') {
+          finalDamage = Math.round(finalDamage * 1.2)
+          weatherTag = '☀️ жар усиливает огонь'
+        } else if (result.attackType === 'water') {
+          finalDamage = Math.round(finalDamage * 0.85)
+          weatherTag = '☀️ вода ослаблена'
+        }
+      } else if (localWeather.kind === 'RAIN') {
+        if (result.attackType === 'water') {
+          finalDamage = Math.round(finalDamage * 1.2)
+          weatherTag = '🌧️ вода усиливается'
+        } else if (result.attackType === 'fire') {
+          finalDamage = Math.round(finalDamage * 0.85)
+          weatherTag = '🌧️ огонь ослаблен'
+        }
+      } else if (localWeather.kind === 'STORM' && Math.random() < 0.28) {
+        const surge = clamp(Math.round(finalDamage * 0.35), 2, 8)
+        finalDamage += surge
+        weatherTag = `⛈️ всплеск молнии +${surge}`
+      } else if (localWeather.kind === 'MIST' && result.usedSpecial) {
+        finalDamage = Math.round(finalDamage * 1.12)
+        weatherTag = '🌫️ туман усилил спец-атаку'
+      }
+
+      const comboBefore = battleStateRef.current.combo[atkSide] ?? 0
+      let comboTag: string | null = null
+      if (comboBefore >= 2) {
+        const bonus = clamp(comboBefore * 2, 2, 12)
+        finalDamage += bonus
+        comboTag = `🔥 комбо x${comboBefore + 1} (+${bonus})`
+      }
+      finalDamage = clamp(finalDamage, 1, 55)
+
+      if (berserkTurns[atkSide] > 0) {
+        const berserkBoost = clamp(Math.round(finalDamage * 0.32), 2, 15)
+        finalDamage += berserkBoost
+        appendLog(formatLine(['🔥', `${attacker.name.toUpperCase()} в БЕРСЕРКЕ: +${berserkBoost} урона`]), 'good')
+      }
       if (battleStateRef.current.counterActive && defSide === 'champ') {
         const reflected = clamp(Math.floor(dmgAfter * 0.5), 3, 10)
         battleStateRef.current.counterActive = false
@@ -419,6 +553,18 @@ export default function PokemonArena() {
 
       defHp = Math.max(0, defHp)
       setDefHp(defHp)
+      setImpactSide(defSide)
+      window.setTimeout(() => {
+        setImpactSide(prev => (prev === defSide ? null : prev))
+      }, 230)
+      battleStateRef.current.combo[atkSide] = Math.min(6, comboBefore + 1)
+      battleStateRef.current.combo[defSide] = 0
+      setComboMeter({ ...battleStateRef.current.combo })
+      setRageMeter(prev => ({
+        ...prev,
+        [atkSide]: clamp(prev[atkSide] + 22 + (result.crit ? 8 : 0), 0, 130),
+        [defSide]: clamp(prev[defSide] + 10, 0, 130),
+      }))
 
       const critTag = result.crit ? '💥 КРИТ!' : '⚔️'
       const specialTag = result.usedSpecial ? '✨ спец' : '💪 физ'
@@ -436,6 +582,8 @@ export default function PokemonArena() {
           effTag,
           `(${defender.name.toUpperCase()} осталось ${defHp} HP)`,
           shieldTag,
+          weatherTag,
+          comboTag,
         ]),
         defHp === 0 ? 'good' : 'default',
       )
@@ -464,6 +612,14 @@ export default function PokemonArena() {
         const next = Math.min(attackerMax, getAtkHp() + result.healAttacker)
         setAtkHp(next)
         appendLog(formatLine(['🩹', `${attacker.name.toUpperCase()} лечится: +${result.healAttacker} HP.`]), 'good')
+      }
+
+      if (berserkTurns[atkSide] > 0) {
+        const lifesteal = clamp(Math.floor(finalDamage * 0.16), 2, 12)
+        const attackerMax = attacker.stats?.hp ?? 1
+        const next = Math.min(attackerMax, getAtkHp() + lifesteal)
+        setAtkHp(next)
+        appendLog(formatLine(['🩸', `${attacker.name.toUpperCase()} крадет жизнь: +${lifesteal} HP`]), 'good')
       }
 
       if (result.healDefender) {
@@ -541,6 +697,7 @@ export default function PokemonArena() {
       ]),
       'header',
     )
+    appendLog(formatLine([localWeather.icon, `Погода боя: ${localWeather.name}.`, localWeather.description]), 'meta')
 
     const champSpeed = localChamp.stats?.speed ?? 0
     const oppSpeed = localOpp.stats?.speed ?? 0
@@ -667,6 +824,16 @@ export default function PokemonArena() {
         await delay(Math.floor(Math.random() * (420 - 260 + 1)) + 260)
         if (token !== fightTokenRef.current) return
 
+        setBerserkTurns(prev => {
+          const next = {
+            champ: Math.max(0, prev.champ - (prev.champ > 0 ? 1 : 0)),
+            opp: Math.max(0, prev.opp - (prev.opp > 0 ? 1 : 0)),
+          }
+          if (prev.champ > 0 && next.champ === 0) appendLog(formatLine(['🧯', 'БЕРСЕРК ЧЕМПИОНА закончился.']), 'meta')
+          if (prev.opp > 0 && next.opp === 0) appendLog(formatLine(['🧯', 'БЕРСЕРК ОППОНЕНТА закончился.']), 'meta')
+          return next
+        })
+
         const champMax = localChamp.stats?.hp ?? 1
         const oppMax = localOpp.stats?.hp ?? 1
 
@@ -715,23 +882,47 @@ export default function PokemonArena() {
     : ({ maxHeight: '500px' } as const)
 
   const loser = Boolean(challenger && challengerHp <= 0)
+  const weatherAuraClass =
+    weather.kind === 'SUN'
+      ? 'arena-aura-sun'
+      : weather.kind === 'RAIN'
+        ? 'arena-aura-rain'
+        : weather.kind === 'STORM'
+          ? 'arena-aura-storm'
+          : weather.kind === 'MIST'
+            ? 'arena-aura-mist'
+            : 'arena-aura-clear'
 
   return (
-    <>
+    <div className={`arena-scene weather-${weather.kind.toLowerCase()}`}>
+      <div className='arena-parallax' aria-hidden>
+        <div className='arena-glow' />
+        <div className='arena-grid' />
+        <div className='arena-particles' />
+      </div>
       <BattleHeader
         champ={champ}
         challenger={challenger}
         champHp={champHp}
         challengerHp={challengerHp}
         activeStatus={activeStatus}
+        combo={comboMeter}
+        rage={rageMeter}
+        berserk={berserkTurns}
+        weather={weather}
         isMega={isMega}
       />
 
-      <section className='grid grid-cols-1 md:grid-cols-3 gap-6 items-start'>
-        <BattleCard ref={leftCardRef} pokemon={champ} />
+      <section className='grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6 items-start relative z-10 mt-8 md:mt-10'>
+        <BattleCard
+          ref={leftCardRef}
+          pokemon={champ}
+          isHit={impactSide === 'champ'}
+          auraClass={weatherAuraClass}
+        />
 
         <div
-          className='md:col-span-1 rounded-2xl border border-zinc-400/50 p-4 shadow-[0px_0px_13px_-4px_rgba(0,0,0,0.4)] flex flex-col'
+          className='battle-console md:col-span-1 rounded-2xl border border-zinc-400/50 p-4 shadow-[0px_0px_13px_-4px_rgba(0,0,0,0.4)] flex flex-col'
           style={logPanelHeightStyle}
         >
           <div className='flex items-center justify-between p-2 mb-3 gap-3'>
@@ -767,6 +958,10 @@ export default function PokemonArena() {
               onShield={() => handleActivateAbility('shield')}
               onHeal={() => handleActivateAbility('heal')}
               onCounter={() => handleActivateAbility('counter')}
+              onBerserk={() => activateBerserk('champ')}
+              canBerserk={rageMeter.champ >= 100 && berserkTurns.champ <= 0}
+              rage={rageMeter.champ}
+              berserkTurns={berserkTurns.champ}
               canMega={canMega}
               megaUsed={megaUsed}
               onMega={handleMega}
@@ -787,8 +982,13 @@ export default function PokemonArena() {
           />
         </div>
 
-        <BattleCard pokemon={challenger} isDefeated={loser} />
+        <BattleCard
+          pokemon={challenger}
+          isDefeated={loser}
+          isHit={impactSide === 'opp'}
+          auraClass={weatherAuraClass}
+        />
       </section>
-    </>
+    </div>
   )
 }
