@@ -1,0 +1,22 @@
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 900' preserveAspectRatio='xMidYMid slice'>
+  <defs>
+    <linearGradient id='bg' x1='0' y1='0' x2='0' y2='1'>
+      <stop offset='0%' stop-color='#151c2b'/>
+      <stop offset='60%' stop-color='#1b2232'/>
+      <stop offset='100%' stop-color='#111724'/>
+    </linearGradient>
+    <radialGradient id='fogLight' cx='56%' cy='30%' r='54%'>
+      <stop offset='0%' stop-color='#c4d3ff' stop-opacity='0.34'/>
+      <stop offset='100%' stop-color='#111724' stop-opacity='0'/>
+    </radialGradient>
+  </defs>
+  <rect width='1600' height='900' fill='url(#bg)'/>
+  <rect width='1600' height='900' fill='url(#fogLight)'/>
+  <g fill='#dce7ff' fill-opacity='0.2'>
+    <ellipse cx='300' cy='520' rx='360' ry='110'/>
+    <ellipse cx='760' cy='560' rx='420' ry='120'/>
+    <ellipse cx='1230' cy='520' rx='330' ry='100'/>
+    <ellipse cx='530' cy='330' rx='280' ry='90'/>
+    <ellipse cx='1060' cy='300' rx='320' ry='96'/>
+  </g>
+</svg>

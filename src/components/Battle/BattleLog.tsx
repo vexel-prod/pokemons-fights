@@ -44,7 +44,7 @@ export function BattleLog({
     <div className='flex flex-col flex-1 min-h-0'>
       <div
         ref={logScrollRef}
-        className='no-scrollbar text-xs opacity-90 whitespace-pre-wrap leading-5 overflow-y-auto p-3 space-y-2 scroll-smooth overscroll-contain rounded-xl border border-zinc-400/30 flex-1 min-h-0'
+        className='no-scrollbar text-[11px] opacity-90 whitespace-pre-wrap leading-4 overflow-y-auto p-2.5 space-y-1.5 scroll-smooth overscroll-contain rounded-xl border border-zinc-400/30 flex-1 min-h-0'
         style={{ minHeight: '0px' }}
       >
         {pageItems.length ? (
@@ -54,7 +54,7 @@ export function BattleLog({
             return (
               <div
                 key={entry.id}
-                className={`border p-2 rounded-lg ${toneClass(tone)} ${headerLike ? 'mt-3 first:mt-0' : ''}`}
+                className={`border p-1.5 rounded-lg ${toneClass(tone)} ${headerLike ? 'mt-2.5 first:mt-0' : ''}`}
                 data-i={idx}
               >
                 {entry.text}

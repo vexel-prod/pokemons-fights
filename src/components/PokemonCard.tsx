@@ -122,7 +122,7 @@ export default function PokemonCard({ pokemon }: PokemonCardProps) {
       <div className='pokemon-card-rim' aria-hidden />
 
       <div className='pokemon-card-inner'>
-        <div className='flex justify-between'>
+        <div className='flex justify-between gap-3'>
           <div className='flex flex-col gap-2 relative'>
             <div className='flex gap-2 overflow-clip items-center'>
               <h2 className='max-w-35 text-xl font-black tracking-wide truncate drop-shadow leading-none text-zinc-100'>
@@ -155,41 +155,39 @@ export default function PokemonCard({ pokemon }: PokemonCardProps) {
           </div>
         </div>
 
-        <div className='flex flex-col items-center gap-2'>
-          <div className='pokemon-sprite-wrap'>
-            {pokemon.image ? (
-              <img
-                src={pokemon.image}
-                alt={pokemon.name}
-                className='pokemon-sprite-3d object-contain'
-                loading='lazy'
-              />
-            ) : (
-              <div className='text-xs opacity-60 p-4'>No image</div>
-            )}
+        <div className='pokemon-sprite-wrap'>
+          {pokemon.image ? (
+            <img
+              src={pokemon.image}
+              alt={pokemon.name}
+              className='pokemon-sprite-3d object-contain'
+              loading='lazy'
+            />
+          ) : (
+            <div className='text-xs opacity-60 p-4'>No image</div>
+          )}
+        </div>
+
+        <div className='w-full pokemon-stats-panel'>
+          <div className='flex justify-between text-[11px] font-black tracking-widest opacity-90 mb-2 text-zinc-100'>
+            <div>
+              POWER METER: <span>{totalStats}</span>
+            </div>
+            <div>
+              BASE EXP: <span>{pokemon.baseExp}</span>
+            </div>
           </div>
 
-          <div className='w-full pokemon-stats-panel'>
-            <div className='flex justify-between text-[11px] font-black tracking-widest opacity-90 mb-2 text-zinc-100'>
-              <div>
-                POWER METER: <span>{totalStats}</span>
-              </div>
-              <div>
-                BASE EXP: <span>{pokemon.baseExp}</span>
-              </div>
-            </div>
-
-            <div className='grid gap-1'>
-              {statConfig.map(stat => (
-                <StatBar
-                  key={stat.key}
-                  label={stat.label}
-                  value={pokemon.stats?.[stat.key] ?? 0}
-                  max={200}
-                  tone={stat.tone}
-                />
-              ))}
-            </div>
+          <div className='grid gap-1'>
+            {statConfig.map(stat => (
+              <StatBar
+                key={stat.key}
+                label={stat.label}
+                value={pokemon.stats?.[stat.key] ?? 0}
+                max={200}
+                tone={stat.tone}
+              />
+            ))}
           </div>
         </div>
       </div>

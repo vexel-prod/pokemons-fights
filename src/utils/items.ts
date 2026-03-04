@@ -1,12 +1,12 @@
 import type { Item } from '../types/battle'
 
 export const ITEMS: Item[] = [
-  { name: 'oran-berry', chance: 0.2, effect: 'heal_30' },
-  { name: 'leftovers', chance: 0.15, effect: 'heal_turn' },
-  { name: 'focus-sash', chance: 0.1, effect: 'survive_1' },
-  { name: 'life-orb', chance: 0.15, effect: 'dmg_plus' },
-  { name: 'choice-band', chance: 0.12, effect: 'atk_plus' },
-  { name: 'rocky-helmet', chance: 0.1, effect: 'reflect_dmg' },
+  { name: '🍊', chance: 0.2, effect: 'heal_30' },
+  { name: '⚕️', chance: 0.15, effect: 'heal_turn' },
+  { name: '🧘', chance: 0.1, effect: 'survive_1' },
+  { name: '🗡️', chance: 0.15, effect: 'dmg_plus' },
+  { name: '🥷', chance: 0.12, effect: 'atk_plus' },
+  { name: '🪖', chance: 0.1, effect: 'reflect_dmg' },
   { name: 'none', chance: 0.18, effect: null },
 ]
 

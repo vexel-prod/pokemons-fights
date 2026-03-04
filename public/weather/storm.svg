@@ -1,0 +1,22 @@
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 900' preserveAspectRatio='xMidYMid slice'>
+  <defs>
+    <linearGradient id='bg' x1='0' y1='0' x2='1' y2='1'>
+      <stop offset='0%' stop-color='#0a1221'/>
+      <stop offset='60%' stop-color='#131b2e'/>
+      <stop offset='100%' stop-color='#080d16'/>
+    </linearGradient>
+    <radialGradient id='glow' cx='50%' cy='22%' r='50%'>
+      <stop offset='0%' stop-color='#8eb6ff' stop-opacity='0.3'/>
+      <stop offset='100%' stop-color='#090f1b' stop-opacity='0'/>
+    </radialGradient>
+  </defs>
+  <rect width='1600' height='900' fill='url(#bg)'/>
+  <rect width='1600' height='900' fill='url(#glow)'/>
+  <g fill='#b8c8e6' fill-opacity='0.22'>
+    <ellipse cx='420' cy='170' rx='230' ry='60'/>
+    <ellipse cx='860' cy='150' rx='290' ry='72'/>
+    <ellipse cx='1250' cy='190' rx='210' ry='56'/>
+  </g>
+  <polygon points='860,220 760,430 850,430 730,690 1020,360 900,360 980,220' fill='#f7f6d1' fill-opacity='0.8'/>
+  <polygon points='430,260 390,350 440,350 375,480 520,310 460,310 500,260' fill='#cde6ff' fill-opacity='0.45'/>
+</svg>

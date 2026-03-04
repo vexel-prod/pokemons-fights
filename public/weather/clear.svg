@@ -1,0 +1,22 @@
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 900' preserveAspectRatio='xMidYMid slice'>
+  <defs>
+    <linearGradient id='bg' x1='0' y1='0' x2='0' y2='1'>
+      <stop offset='0%' stop-color='#0e1c35'/>
+      <stop offset='55%' stop-color='#152846'/>
+      <stop offset='100%' stop-color='#0a111f'/>
+    </linearGradient>
+    <radialGradient id='haze' cx='50%' cy='20%' r='48%'>
+      <stop offset='0%' stop-color='#87d6ff' stop-opacity='0.34'/>
+      <stop offset='100%' stop-color='#0a1326' stop-opacity='0'/>
+    </radialGradient>
+  </defs>
+  <rect width='1600' height='900' fill='url(#bg)'/>
+  <rect width='1600' height='900' fill='url(#haze)'/>
+  <circle cx='1320' cy='160' r='110' fill='#ffe8a3' fill-opacity='0.85'/>
+  <circle cx='1320' cy='160' r='170' fill='#ffe8a3' fill-opacity='0.22'/>
+  <g fill='#f4fbff' fill-opacity='0.3'>
+    <ellipse cx='360' cy='170' rx='130' ry='36'/>
+    <ellipse cx='700' cy='210' rx='170' ry='42'/>
+    <ellipse cx='1040' cy='140' rx='120' ry='30'/>
+  </g>
+</svg>

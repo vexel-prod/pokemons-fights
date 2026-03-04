@@ -110,3 +110,22 @@ export interface LogEntry {
   text: string
   tone: LogTone
 }
+
+export type CombatAbilityKind = 'damage' | 'shield' | 'heal' | 'focus'
+
+export interface CombatAbility {
+  id: string
+  name: string
+  description: string
+  icon: string
+  kind: CombatAbilityKind
+  type: string | null
+  power: number
+  accuracy: number
+  cooldown: number
+  shieldValue?: number
+  healRatio?: number
+  focusBonus?: number
+}
+
+export type AbilityCooldownMap = Record<string, number>
