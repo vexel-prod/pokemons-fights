@@ -15,8 +15,12 @@ body,
 
 #root {
   min-height: 100dvh;
-  display: block;
-  overflow-y: auto;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
 }
 
 body {
@@ -24,18 +28,49 @@ body {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes slash {
-  from { transform: rotate(-25deg) scaleX(0); }
-  to { transform: rotate(-25deg) scaleX(1); }
+  from {
+    transform: rotate(-25deg) scaleX(0);
+  }
+  to {
+    transform: rotate(-25deg) scaleX(1);
+  }
 }
 
 @keyframes pop {
-  0% { transform: scale(0.6); opacity: 0; }
-  100% { transform: scale(1); opacity: 1; }
+  0% {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes spriteIn {
+  0% {
+    opacity: 0;
+    transform: scale(1.04);
+    filter: blur(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
+  }
+}
+
+.animate-spriteIn {
+  animation: spriteIn 0.35s ease-out forwards;
 }
 
 .animate-fadeIn {
@@ -49,4 +84,40 @@ body {
 
 .animate-pop {
   animation: pop 0.3s ease forwards;
+}
+
+/* Плавность полосок HP */
+.hp-bar-track {
+  transform: translateZ(0);
+}
+
+.hp-bar-fill {
+  transition: width 320ms ease;
+  will-change: width;
+}
+
+/* Если пользователь предпочитает меньше анимаций */
+@media (prefers-reduced-motion: reduce) {
+  .hp-bar-fill {
+    transition: none;
+  }
+}
+
+.badge-electric {
+  background-color: #c1a43c;
+  @apply font-black border border-zinc-400/50 opacity-80 text-zinc-800;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Firefox */
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+/* IE 10+ */
+.no-scrollbar {
+  -ms-overflow-style: none;
 }
