@@ -5,6 +5,8 @@ import { useBattleLog } from '../hooks/useBattleLog'
 import { usePokemon } from '../hooks/usePokemon'
 import type { LogTone } from '../types/battle'
 import { WEATHER_BG_IMAGE } from '../utils/weatherScene'
+import { Button3D } from 'react-3d-button'
+import 'react-3d-button/styles'
 
 const toneClass = (tone: LogTone): string => {
   if (tone === 'header') return 'border-t-2 border-t-zinc-500/70 bg-zinc-900/20'
@@ -106,8 +108,14 @@ export default function PokemonArena() {
     : ({ maxHeight: '500px' } as const)
 
   return (
-    <div className={`arena-scene arena-weather-${weather.kind.toLowerCase()}`} style={sceneStyle}>
-      <div className='arena-parallax' aria-hidden>
+    <div
+      className={`arena-scene arena-weather-${weather.kind.toLowerCase()}`}
+      style={sceneStyle}
+    >
+      <div
+        className='arena-parallax'
+        aria-hidden
+      >
         <div className='arena-bg-image-layer' />
         <div className='arena-glow' />
         <div className='arena-grid' />
@@ -128,30 +136,46 @@ export default function PokemonArena() {
       />
 
       <section className='grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6 items-start relative z-10 mt-8 md:mt-10'>
-        <BattleCard ref={leftCardRef} pokemon={champ} isHit={impactSide === 'champ'} auraClass={weatherAuraClass} />
+        <BattleCard
+          ref={leftCardRef}
+          pokemon={champ}
+          isHit={impactSide === 'champ'}
+          auraClass={weatherAuraClass}
+        />
 
         <div
           className='battle-console md:col-span-1 rounded-2xl border border-zinc-400/50 p-4 shadow-[0px_0px_13px_-4px_rgba(0,0,0,0.4)] flex flex-col'
           style={logPanelHeightStyle}
         >
-          <div className='flex items-center justify-between p-2 mb-2 gap-2'>
-            <div className='text-sm font-semibold'>Лог боя</div>
-            <div className='flex items-center gap-2'>
+          <div className='flex items-center justify-center p-2 mb-2 gap-2'>
+            <div className='flex text-zinc-200 items-center justify-center gap-2 min-w-37.5 special-button-wrapper'>
               {!hasBoth ? (
-                <button className='arena-btn-mini' onClick={() => void prepareBattle()} disabled={!canPrepare}>
-                  {isLoading ? 'Загрузка...' : 'Подготовить'}
-                </button>
+                <Button3D
+                  type='success'
+                  onPress={() => void prepareBattle()}
+                  disabled={!canPrepare}
+                >
+                  {isLoading ? 'LOADING...' : 'NEW GAME'}
+                </Button3D>
               ) : (
                 <>
                   {needsOpponent && (
-                    <button className='arena-btn-mini' onClick={() => void loadOpponent()} disabled={!canLoadOpponent}>
-                      {isLoading ? 'Загрузка...' : 'Следующий бой'}
-                    </button>
+                    <Button3D
+                      type='warning'
+                      onPress={() => void loadOpponent()}
+                      disabled={!canLoadOpponent}
+                    >
+                      {isLoading ? 'LOADING...' : 'RESUME'}
+                    </Button3D>
                   )}
                   {hasBoth && !needsOpponent && (
-                    <button className='arena-btn-mini' onClick={() => void startBattle()} disabled={!canFight}>
-                      {isFighting ? 'Бой...' : 'Начать бой'}
-                    </button>
+                    <Button3D
+                      type='danger'
+                      onPress={() => void startBattle()}
+                      disabled={!canFight}
+                    >
+                      {isFighting ? 'FIGHTING...' : 'FIGHT!'}
+                    </Button3D>
                   )}
                 </>
               )}

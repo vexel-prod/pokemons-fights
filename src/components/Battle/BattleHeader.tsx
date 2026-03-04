@@ -49,10 +49,6 @@ export function BattleHeader({
 
   return (
     <section className='battle-header-panel shadow-[0px_0px_18px_-2px_rgba(0,0,0,0.45)] rounded-2xl p-6 md:p-8 border border-zinc-300/40 relative'>
-      <div className='weather-badge' title={weather.description}>
-        Погода: {weather.name}
-      </div>
-
       <div className='flex flex-col gap-3 items-center'>
         <div className='flex justify-between w-full items-center gap-10'>
           <div className='w-full flex flex-col items-start justify-center'>
@@ -104,6 +100,10 @@ export function BattleHeader({
           </div>
 
           <div className='relative flex items-center justify-center'>
+            <span
+              className='absolute inset-0 flex items-center justify-center text-9xl opacity-10'
+            >{weather.icon}
+            </span>
             <span className='font-extrabold text-5xl skeleton skeleton-text'>VS</span>
             <span className='absolute left-0 font-extrabold text-5xl skeleton skeleton-text text-yellow-400/70'>
               VS

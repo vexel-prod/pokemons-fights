@@ -35,19 +35,17 @@ export function BattleControls({
           return (
             <button
               key={`${ability.id}-${index}`}
-              className='arena-btn'
+              className='ability-btn'
               disabled={disabled}
               onClick={() => onUseAbility(ability.id)}
               title={ability.description}
             >
-              <span className='arena-btn__shadow' />
-              <span className='arena-btn__edge' />
-              <span className='arena-btn__face'>
-                <span className='arena-btn__slot'>{index + 1}</span>
-                <span>
+              <span className='ability-btn__slot'>{index + 1}</span>
+              <span className='ability-btn__label'>
+                <span className='ability-btn__name'>
                   {ability.icon} {ability.name}
                 </span>
-                {cooldown > 0 ? <span className='arena-btn__cd'>CD {cooldown}</span> : <span className='arena-btn__cd'>READY</span>}
+                {cooldown > 0 ? <span className='ability-btn__meta'>CD {cooldown}</span> : <span className='ability-btn__meta'>READY</span>}
               </span>
             </button>
           )

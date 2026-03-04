@@ -7,6 +7,7 @@
       "dependencies": {
         "next": "16.1.6",
         "react": "19.2.0",
+        "react-3d-button": "^1.3.0",
         "react-dom": "19.2.0",
         "tailwindcss": "^4.2.1",
       },
@@ -430,6 +431,8 @@
     "punycode": ["punycode@2.3.1", "", {}, "sha512-vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg=="],
 
     "react": ["react@19.2.0", "", {}, "sha512-tmbWg6W31tQLeB5cdIBOicJDJRR2KzXsV7uSK9iNfLWQ5bIZfxuPEHp7M8wiHyHnn0DD1i7w3Zmin0FtkrwoCQ=="],
+
+    "react-3d-button": ["react-3d-button@1.3.0", "", { "peerDependencies": { "react": ">=16.8.0", "react-dom": ">=16.8.0" } }, "sha512-T6NlEsSTTSb3up0pyqe5CsLSAB/hzxuTtJaxMn19WVHWNmEuElej7cYd7KVv8sJNjd2FS8tJn8rj8YIOYUiMQQ=="],
 
     "react-dom": ["react-dom@19.2.0", "", { "dependencies": { "scheduler": "^0.27.0" }, "peerDependencies": { "react": "^19.2.0" } }, "sha512-UlbRu4cAiGaIewkPyiRGJk0imDN2T3JjieT6spoL2UeSf5od4n5LB/mQ4ejmxhCFT1tYe8IvaFulzynWovsEFQ=="],
 

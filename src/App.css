@@ -283,11 +283,7 @@ body {
 }
 
 .battle-card-3dgrid > :first-child {
-  transform:
-    rotateX(var(--grid-rx))
-    rotateY(var(--grid-ry))
-    translateZ(24px)
-    scale(1.018);
+  transform: rotateX(var(--grid-rx)) rotateY(var(--grid-ry)) translateZ(24px) scale(1.018);
   transition:
     transform 340ms cubic-bezier(0.22, 1, 0.36, 1),
     box-shadow 340ms ease,
@@ -413,7 +409,10 @@ body {
     radial-gradient(circle at 18% 24%, rgba(255, 255, 255, 0.4) 0 0.5px, transparent 1px),
     radial-gradient(circle at 72% 62%, rgba(255, 255, 255, 0.36) 0 0.5px, transparent 1px),
     radial-gradient(circle at 54% 82%, rgba(255, 255, 255, 0.28) 0 0.5px, transparent 1px);
-  background-size: 3px 3px, 4px 4px, 5px 5px;
+  background-size:
+    3px 3px,
+    4px 4px,
+    5px 5px;
 }
 
 .pokemon-card-specular {
@@ -472,8 +471,7 @@ body {
   max-height: 100%;
   height: auto;
   transform: translateZ(28px);
-  filter:
-    drop-shadow(0 10px 8px rgba(0, 0, 0, 0.35))
+  filter: drop-shadow(0 10px 8px rgba(0, 0, 0, 0.35))
     drop-shadow(0 0 12px rgba(255, 255, 255, 0.08));
   animation: cardFloat 3.2s ease-in-out infinite;
 }
@@ -524,109 +522,88 @@ body {
   transition: width 90ms linear;
 }
 
-.arena-btn {
-  --btn-bg: #1f4872;
-  --btn-bg2: #13355a;
-  --btn-edge: #0f2b49;
-  --btn-shadow: rgba(3, 8, 17, 0.55);
-  position: relative;
-  border: 0;
-  background: transparent;
-  padding: 0;
-  cursor: pointer;
-  outline-offset: 4px;
-  text-transform: none;
-  transition: filter 0.25s;
-}
-
-.arena-btn:hover {
-  filter: brightness(1.06);
-}
-
-.arena-btn:active .arena-btn__face {
-  transform: translateY(-1px);
-}
-
-.arena-btn:disabled {
-  cursor: not-allowed;
-  filter: grayscale(0.25) brightness(0.8);
-}
-
-.arena-btn:disabled .arena-btn__face {
-  transform: translateY(-1px);
-}
-
-.arena-btn__shadow {
-  position: absolute;
-  inset: 0;
-  border-radius: 12px;
-  background: var(--btn-shadow);
-  transform: translateY(3px);
-  transition: transform 220ms cubic-bezier(0.3, 0.7, 0.4, 1);
-}
-
-.arena-btn__edge {
-  position: absolute;
-  inset: 0;
-  border-radius: 12px;
-  background: linear-gradient(to left, #071120 0%, var(--btn-edge) 16%, #335e90 100%);
-}
-
-.arena-btn__face {
-  position: relative;
+.ability-btn {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  gap: 10px;
-  border-radius: 12px;
+  justify-content: space-between;
+  gap: 8px;
   min-height: 44px;
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid rgba(151, 182, 255, 0.35);
   padding: 8px 10px;
+  background:
+    linear-gradient(140deg, rgba(22, 43, 71, 0.9), rgba(14, 29, 49, 0.9)),
+    radial-gradient(circle at 110% -20%, rgba(109, 185, 255, 0.26), transparent 45%);
+  color: #eaf4ff;
   font-size: 12px;
   font-weight: 800;
-  letter-spacing: 0.01em;
-  color: #f2f7ff;
-  transform: translateY(-3px);
-  background: linear-gradient(to right, var(--btn-bg), var(--btn-bg2));
-  transition: transform 220ms cubic-bezier(0.3, 0.7, 0.4, 1);
+  transition:
+    transform 0.15s ease,
+    filter 0.15s ease,
+    border-color 0.15s ease;
 }
 
-.arena-btn__slot {
+.ability-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  filter: brightness(1.06);
+  border-color: rgba(183, 207, 255, 0.62);
+}
+
+.ability-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.ability-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.ability-btn__slot {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   min-width: 20px;
   height: 20px;
   border-radius: 999px;
-  font-size: 11px;
-  color: #ffefce;
-  border: 1px solid rgba(255, 220, 156, 0.44);
-  background: rgba(0, 0, 0, 0.25);
-}
-
-.arena-btn__cd {
+  border: 1px solid rgba(180, 210, 255, 0.42);
+  background: rgba(8, 18, 33, 0.45);
+  color: #d6ebff;
   font-size: 10px;
-  opacity: 0.9;
+  font-weight: 900;
 }
 
-.arena-btn-mini {
-  border: 1px solid rgba(255, 192, 121, 0.55);
-  border-radius: 999px;
-  padding: 4px 12px;
-  font-size: 12px;
-  font-weight: 700;
-  background: linear-gradient(130deg, rgba(255, 170, 84, 0.25), rgba(80, 167, 255, 0.22));
-  color: #fff7ea;
-  transition: transform 180ms ease, filter 180ms ease;
+.ability-btn__label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  width: 100%;
+  min-width: 0;
 }
 
-.arena-btn-mini:hover:not(:disabled) {
-  transform: translateY(-1px);
-  filter: brightness(1.08);
+.ability-btn__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11px;
+  line-height: 1.1;
 }
 
-.arena-btn-mini:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+.ability-btn__meta {
+  flex: 0 0 42px;
+  text-align: right;
+  font-size: 10px;
+  color: rgba(211, 234, 255, 0.92);
+  opacity: 0.92;
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .cp-btn {
+    animation: none;
+    transform: none;
+  }
 }
 
 /* Если пользователь предпочитает меньше анимаций */
