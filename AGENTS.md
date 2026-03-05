@@ -26,6 +26,7 @@ Always run `bun run lint` and `bun run build` after non-trivial changes.
 - `src/utils/loreAbilities.ts`: генерация лор-способностей покемона и выбор способности оппонента.
 - `src/utils/weatherScene.ts`: пресеты погоды и маппинг фоновых сцен.
 - `public/weather/*`: фоновые SVG-сцены погоды (neutral/clear/sun/rain/storm/mist).
+- `src/components/Battle/BattleControls.tsx`: кнопки способностей (компактный стабильный стиль, без heavy-анимаций).
 
 ## Development Rules
 - Keep strict TypeScript types; do not reintroduce `any`.
@@ -49,9 +50,10 @@ Always run `bun run lint` and `bun run build` after non-trivial changes.
 - Keep mobile/desktop behavior intact when editing layout classes.
 - Глобальный фон управляется погодой боя через CSS variable `--arena-bg-image`.
 - Иконка погоды из шапки удалена; используется сцена фона + текстовый бейдж.
-- Кнопки способностей стилизованы под layered 3D button pattern (codepen-like) в `App.css`.
-- Кнопки способностей рендерятся под логом боя (`BattleControls`).
+- Codepen-like стиль применяется только к action-кнопкам в шапке лога (`Подготовить`, `Следующий бой`, `Начать бой`).
+- Кнопки способностей рендерятся под логом (`BattleControls`) и должны оставаться компактными/читаемыми без сложных blend-эффектов.
 - 3D-hover карточек управляется динамическими CSS-переменными `--grid-rx/--grid-ry`.
+- Для списков способностей всегда обеспечивать уникальные React-ключи (использовать `id + index` как безопасный fallback).
 
 ## Safety Checklist Before Finish
 1. `bun run lint` passes.
