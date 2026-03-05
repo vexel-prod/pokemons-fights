@@ -5,7 +5,7 @@ export const ARENA_WEATHERS: ArenaWeather[] = [
   { kind: 'SUN', name: 'Палящее солнце', icon: '☀️', description: 'Огонь усиливается, вода слабеет' },
   { kind: 'RAIN', name: 'Ливень', icon: '🌧️', description: 'Вода усиливается, огонь слабеет' },
   { kind: 'STORM', name: 'Грозовой фронт', icon: '⛈️', description: 'Стихийные всплески урона' },
-  { kind: 'MIST', name: 'Мистический туман', icon: '🌫️', description: 'Спец-атаки усиливаются' },
+  { kind: 'MIST', name: 'Мистические облака', icon: '☁️', description: 'Спец-атаки усиливаются' },
 ]
 
 export const pickWeather = (): ArenaWeather =>

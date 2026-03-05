@@ -18,7 +18,8 @@ const toneClass = (tone: LogTone): string => {
 
 export default function PokemonArena() {
   const { count, champ, challenger, setChamp, setChallenger } = usePokemon()
-  const { page, totalPages, pageItems, setPage, appendLog, clearLog, logScrollRef } = useBattleLog(14)
+  const { page, totalPages, pageItems, setPage, appendLog, clearLog, logScrollRef } =
+    useBattleLog(14)
 
   const [logMaxHeight, setLogMaxHeight] = useState<number | null>(null)
   const leftCardRef = useRef<HTMLDivElement | null>(null)
@@ -154,6 +155,7 @@ export default function PokemonArena() {
                   type='success'
                   onPress={() => void prepareBattle()}
                   disabled={!canPrepare}
+                  fullWidth
                 >
                   {isLoading ? 'LOADING...' : 'NEW GAME'}
                 </Button3D>
@@ -164,6 +166,7 @@ export default function PokemonArena() {
                       type='warning'
                       onPress={() => void loadOpponent()}
                       disabled={!canLoadOpponent}
+                      fullWidth
                     >
                       {isLoading ? 'LOADING...' : 'RESUME'}
                     </Button3D>
@@ -173,6 +176,7 @@ export default function PokemonArena() {
                       type='danger'
                       onPress={() => void startBattle()}
                       disabled={!canFight}
+                      fullWidth
                     >
                       {isFighting ? 'FIGHTING...' : 'FIGHT!'}
                     </Button3D>

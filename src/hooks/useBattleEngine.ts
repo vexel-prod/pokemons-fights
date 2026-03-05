@@ -1,4 +1,12 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type Dispatch, type SetStateAction } from 'react'
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type Dispatch,
+  type SetStateAction,
+} from 'react'
 import { fetchPokemon, getRandomPokemonId } from '../api/poke'
 import type {
   AbilityCooldownMap,
@@ -9,7 +17,12 @@ import type {
   Pokemon,
 } from '../types/battle'
 import { clamp, delay, getTypes } from '../utils/helpers'
-import { abilityIsReady, buildLoreAbilities, pickOpponentAbility, reduceCooldowns } from '../utils/loreAbilities'
+import {
+  abilityIsReady,
+  buildLoreAbilities,
+  pickOpponentAbility,
+  reduceCooldowns,
+} from '../utils/loreAbilities'
 import { ARENA_WEATHERS, pickWeather } from '../utils/weatherScene'
 import { typeEffectiveness } from '../utils/typeChart'
 
@@ -199,7 +212,10 @@ export function useBattleEngine({
       if (choice.ability.kind === 'shield') {
         const amount = choice.ability.shieldValue ?? 10
         runtimeRef.current.shield[choice.side] = runtimeRef.current.shield[choice.side] + amount
-        appendLog(toLine(['🛡️', attacker.name.toUpperCase(), `поднимает барьер (+${amount}).`]), 'good')
+        appendLog(
+          toLine(['🛡️', attacker.name.toUpperCase(), `поднимает барьер (+${amount}).`]),
+          'good',
+        )
         return { damage: 0, defenderLeft: defenderHp }
       }
 
@@ -214,23 +230,39 @@ export function useBattleEngine({
           hpRef.current.opp = next
           setChallengerHp(next)
         }
-        appendLog(toLine(['💚', attacker.name.toUpperCase(), `восстанавливает ${amount} HP.`]), 'good')
+        appendLog(
+          toLine(['💚', attacker.name.toUpperCase(), `восстанавливает ${amount} HP.`]),
+          'good',
+        )
         return { damage: 0, defenderLeft: defenderHp }
       }
 
       if (choice.ability.kind === 'focus') {
         const bonus = choice.ability.focusBonus ?? 0.16
-        runtimeRef.current.focus[choice.side] = clamp(runtimeRef.current.focus[choice.side] + bonus, 0, 0.35)
+        runtimeRef.current.focus[choice.side] = clamp(
+          runtimeRef.current.focus[choice.side] + bonus,
+          0,
+          0.35,
+        )
         appendLog(
-          toLine(['🎯', attacker.name.toUpperCase(), `концентрируется (+${Math.round(bonus * 100)}% к следующему удару).`]),
+          toLine([
+            '🎯',
+            attacker.name.toUpperCase(),
+            `концентрируется (+${Math.round(bonus * 100)}% к следующему удару).`,
+          ]),
           'meta',
         )
         return { damage: 0, defenderLeft: defenderHp }
       }
 
       const atkStat = Math.max(attacker.stats?.attack ?? 1, attacker.stats?.['special-attack'] ?? 1)
-      const defStat = Math.max(defender.stats?.defense ?? 1, defender.stats?.['special-defense'] ?? 1)
-      const base = Math.round(((atkStat / Math.max(1, defStat)) * (choice.ability.power || 16)) / 2.3)
+      const defStat = Math.max(
+        defender.stats?.defense ?? 1,
+        defender.stats?.['special-defense'] ?? 1,
+      )
+      const base = Math.round(
+        ((atkStat / Math.max(1, defStat)) * (choice.ability.power || 16)) / 2.3,
+      )
       const eff = typeEffectiveness(choice.ability.type, getTypes(defender))
       const stab = choice.ability.type && getTypes(attacker).includes(choice.ability.type) ? 1.2 : 1
       const focusBonus = 1 + runtimeRef.current.focus[choice.side]
@@ -242,11 +274,16 @@ export function useBattleEngine({
 
       const landed = Math.random() <= choice.ability.accuracy
       if (!landed) {
-        appendLog(toLine(['💨', attacker.name.toUpperCase(), `${choice.ability.name} промахивается.`]), 'bad')
+        appendLog(
+          toLine(['💨', attacker.name.toUpperCase(), `${choice.ability.name} промахивается.`]),
+          'bad',
+        )
         return { damage: 0, defenderLeft: defenderHp }
       }
 
-      let dmg = Math.round(base * eff * stab * focusBonus * weatherBonus * choice.timingBonus * critMul)
+      let dmg = Math.round(
+        base * eff * stab * focusBonus * weatherBonus * choice.timingBonus * critMul,
+      )
       dmg = clamp(dmg, 2, 60)
 
       const shield = runtimeRef.current.shield[defSide]
@@ -264,7 +301,13 @@ export function useBattleEngine({
       }
 
       const effTag =
-        eff >= 2 ? 'суперэффективно' : eff <= 0.5 ? 'малоэффективно' : eff === 0 ? 'не действует' : null
+        eff >= 2
+          ? 'суперэффективно'
+          : eff <= 0.5
+            ? 'малоэффективно'
+            : eff === 0
+              ? 'не действует'
+              : null
       const critTag = crit ? 'КРИТ!' : null
       const shieldTag = absorbed > 0 ? `щит поглотил ${absorbed}` : null
 
@@ -345,7 +388,10 @@ export function useBattleEngine({
       if (!chosenAbilityId) {
         appendLog('⌛ Время вышло, срабатывает базовая атака.', 'bad')
       } else {
-        appendLog(toLine(['🕹️', `Тайминг: ${reactionMs}мс`, `(бонус x${playerTiming.toFixed(2)})`]), 'meta')
+        appendLog(
+          toLine(['🕹️', `Тайминг: ${reactionMs}мс`, `(бонус x${playerTiming.toFixed(2)})`]),
+          'meta',
+        )
       }
 
       applyAbility({ ability, side: 'champ', timingBonus: playerTiming })
@@ -431,7 +477,10 @@ export function useBattleEngine({
 
       appendLog(toLine(['🏆 Чемпион:', champion.name.toUpperCase()]), 'good')
       appendLog(toLine(['🥊 Оппонент:', opponent.name.toUpperCase()]), 'default')
-      appendLog(toLine(['🌦️ Арена:', localWeather.name]), 'meta')
+      appendLog(
+        toLine(['🌦️ Арена:', `${localWeather.name}, ${localWeather.description.toLowerCase()}`]),
+        'meta',
+      )
       appendLog('▶️ Нажмите «Начать бой».', 'meta')
     } catch {
       appendLog('❌ Не удалось загрузить покемонов. Попробуйте снова.', 'bad')
@@ -461,7 +510,10 @@ export function useBattleEngine({
       const localWeather = pickWeather()
       setWeather(localWeather)
       appendLog(toLine(['✅ Новый оппонент:', opponent.name.toUpperCase()]), 'good')
-      appendLog(toLine(['🌦️ Арена:', localWeather.name]), 'meta')
+      appendLog(
+        toLine(['🌦️ Арена:', `${localWeather.name}, ${localWeather.description.toLowerCase()}`]),
+        'meta',
+      )
       appendLog('▶️ Нажмите «Начать бой».', 'meta')
     } catch {
       appendLog('❌ Не удалось загрузить оппонента.', 'bad')
@@ -477,11 +529,17 @@ export function useBattleEngine({
     setIsFighting(true)
     setNeedsOpponent(false)
     setTurn(1)
-    appendLog(toLine(['⚔️ БОЙ:', champ.name.toUpperCase(), 'vs', challenger.name.toUpperCase()]), 'header')
+    appendLog(
+      toLine(['⚔️ БОЙ:', champ.name.toUpperCase(), 'vs', challenger.name.toUpperCase()]),
+      'header',
+    )
 
     const localWeather = pickWeather()
     setWeather(localWeather)
-    appendLog(toLine(['🌦️ Условия арены:', localWeather.name, `(${localWeather.description})`]), 'meta')
+    appendLog(
+      toLine(['🌦️ Условия арены:', localWeather.name, `(${localWeather.description})`]),
+      'meta',
+    )
 
     const champMax = champ.stats?.hp ?? 1
     const oppMax = challenger.stats?.hp ?? 1
