@@ -1,0 +1,31 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model PokemonProgress {
+  id               Int      @id @default(autoincrement())
+  pokemonId        Int      @unique
+  baseName         String
+  currentName      String
+  battles          Int      @default(0)
+  rebirthLevel     Int      @default(0)
+  powerMultiplier  Float    @default(1)
+  evolutionPath    String?
+  speciesUrl       String?
+  evolutionChainUrl String?
+  typesCsv         String
+  baseExp          Int      @default(0)
+  hp               Int      @default(1)
+  attack           Int      @default(1)
+  defense          Int      @default(1)
+  speed            Int      @default(1)
+  spAttack         Int      @default(1)
+  spDefense        Int      @default(1)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}

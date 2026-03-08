@@ -466,6 +466,17 @@ body {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
 }
 
+.pokemon-rebirth-pill {
+  border: 1px solid rgba(211, 222, 255, 0.38);
+  border-radius: 9999px;
+  padding: 1px 8px;
+  font-size: 11px;
+  font-weight: 800;
+  color: rgba(244, 248, 255, 0.9);
+  background: linear-gradient(150deg, rgba(113, 90, 153, 0.6), rgba(47, 81, 82, 0.7));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
 .pokemon-sprite-3d {
   width: min(100%, 210px);
   max-height: 100%;

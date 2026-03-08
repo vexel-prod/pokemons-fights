@@ -41,6 +41,7 @@ export interface Pokemon {
   isGold?: boolean
   isLegendary?: boolean
   isMythical?: boolean
+  rebirthLevel?: number
 }
 
 export type StatusKind = 'BURN' | 'POISON' | 'CURSE' | 'PARALYZE' | 'FREEZE'
@@ -111,7 +112,16 @@ export interface LogEntry {
   tone: LogTone
 }
 
-export type CombatAbilityKind = 'damage' | 'shield' | 'heal' | 'focus'
+export type CombatZone = 'high' | 'mid' | 'low'
+
+export interface TacticsPool {
+  attack: number
+  defense: number
+  counter: number
+  spirit: number
+}
+
+export type CombatAbilityKind = 'damage' | 'shield' | 'heal' | 'focus' | 'counter' | 'poison'
 
 export interface CombatAbility {
   id: string
@@ -126,6 +136,10 @@ export interface CombatAbility {
   shieldValue?: number
   healRatio?: number
   focusBonus?: number
+  counterRatio?: number
+  poisonTurns?: number
+  poisonDamageRatio?: number
+  tacticCost?: Partial<TacticsPool>
 }
 
 export type AbilityCooldownMap = Record<string, number>

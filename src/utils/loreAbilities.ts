@@ -276,6 +276,7 @@ const DEFAULT_SHIELD: CombatAbility = {
   accuracy: 1,
   cooldown: 2,
   shieldValue: 10,
+  tacticCost: { defense: 2 },
 }
 
 const DEFAULT_HEAL: CombatAbility = {
@@ -289,9 +290,49 @@ const DEFAULT_HEAL: CombatAbility = {
   accuracy: 1,
   cooldown: 3,
   healRatio: 0.16,
+  tacticCost: { spirit: 2 },
+}
+
+const DEFAULT_COUNTER: CombatAbility = {
+  id: 'counter-core',
+  name: 'Контратака',
+  description: 'Отразит часть следующего полученного урона.',
+  icon: '↩️',
+  kind: 'counter',
+  type: null,
+  power: 0,
+  accuracy: 1,
+  cooldown: 2,
+  counterRatio: 0.55,
+  tacticCost: { counter: 2 },
+}
+
+const DEFAULT_POISON: CombatAbility = {
+  id: 'poison-core',
+  name: 'Отравление',
+  description: 'Накладывает яд с уроном по времени.',
+  icon: '☠️',
+  kind: 'poison',
+  type: 'poison',
+  power: 0,
+  accuracy: 0.92,
+  cooldown: 3,
+  poisonTurns: 3,
+  poisonDamageRatio: 0.1,
+  tacticCost: { spirit: 3 },
 }
 
 const asAbilityId = (value: string): string => value.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-')
+
+const withDefaultCost = (ability: CombatAbility): CombatAbility => {
+  if (ability.tacticCost) return ability
+  if (ability.kind === 'shield') return { ...ability, tacticCost: { defense: 2 } }
+  if (ability.kind === 'counter') return { ...ability, tacticCost: { counter: 2 } }
+  if (ability.kind === 'heal') return { ...ability, tacticCost: { spirit: 2 } }
+  if (ability.kind === 'poison') return { ...ability, tacticCost: { spirit: 3 } }
+  if (ability.kind === 'focus') return { ...ability, tacticCost: { spirit: 1 } }
+  return ability
+}
 
 const fromOverride = (abilityName: string): CombatAbility | null => {
   const key = abilityName.trim().toLowerCase().replace(/-/g, '_')
@@ -322,44 +363,28 @@ export const buildLoreAbilities = (pokemon: Pokemon): CombatAbility[] => {
     .map(fromOverride)
     .filter((entry): entry is CombatAbility => Boolean(entry))
 
-  const fallbackFocus: CombatAbility = {
-    id: 'focus-core',
-    name: 'Battle Focus',
-    description: 'Точный тайминг усилит следующий удар.',
-    icon: '🎯',
-    kind: 'focus',
-    type: null,
-    power: 0,
-    accuracy: 1,
-    cooldown: 2,
-    focusBonus: 0.16,
-  }
-
-  const tactical = mappedByAbility.find(item => item.kind === 'focus') ?? fallbackFocus
-  const sustain = mappedByAbility.find(item => item.kind === 'heal') ?? DEFAULT_HEAL
+  const tactical = mappedByAbility.find(item => item.kind === 'counter') ?? DEFAULT_COUNTER
+  const sustain = mappedByAbility.find(item => item.kind === 'poison') ?? DEFAULT_POISON
   const defense = mappedByAbility.find(item => item.kind === 'shield') ?? DEFAULT_SHIELD
 
-  const secondStrikeId =
-    secondaryType === primaryType ? `strike-${secondaryType}-alt` : `strike-${secondaryType}`
+  const hasDualTypes = secondaryType !== primaryType
+  const secondSlot = hasDualTypes
+    ? ({ ...secondaryStrike, id: `strike-${secondaryType}` } satisfies CombatAbility)
+    : ({ ...tactical, id: tactical.id || `counter-${asAbilityId(tactical.name)}` } satisfies CombatAbility)
 
   const abilities: CombatAbility[] = [
     { ...primaryStrike, id: `strike-${primaryType}` },
-    { ...secondaryStrike, id: secondStrikeId },
-    { ...tactical, id: tactical.id || `tactical-${asAbilityId(tactical.name)}` },
+    secondSlot,
     { ...defense, id: defense.id || `defense-${asAbilityId(defense.name)}` },
+    { ...sustain, id: sustain.id || `poison-${asAbilityId(sustain.name)}` },
   ]
-
-  const hasHeal = abilities.some(item => item.kind === 'heal')
-  if (!hasHeal) {
-    abilities[3] = { ...sustain, id: sustain.id || `sustain-${asAbilityId(sustain.name)}` }
-  }
 
   const seen = new Map<string, number>()
   const normalized = abilities.slice(0, 4).map(item => {
     const hits = seen.get(item.id) ?? 0
     seen.set(item.id, hits + 1)
-    if (hits === 0) return item
-    return { ...item, id: `${item.id}-${hits + 1}` }
+    const withUniqueId = hits === 0 ? item : { ...item, id: `${item.id}-${hits + 1}` }
+    return withDefaultCost(withUniqueId)
   })
 
   return normalized
@@ -379,8 +404,14 @@ export const pickOpponentAbility = (
   const heal = pool.find(item => item.kind === 'heal')
   if (heal && hp / Math.max(1, maxHp) < 0.35) return heal
 
+  const poison = pool.find(item => item.kind === 'poison')
+  if (poison && Math.random() < 0.34) return poison
+
   const shield = pool.find(item => item.kind === 'shield')
   if (shield && hp / Math.max(1, maxHp) < 0.55 && Math.random() < 0.45) return shield
+
+  const counter = pool.find(item => item.kind === 'counter')
+  if (counter && hp / Math.max(1, maxHp) < 0.65 && Math.random() < 0.36) return counter
 
   const focus = pool.find(item => item.kind === 'focus')
   if (focus && Math.random() < 0.22) return focus

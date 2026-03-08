@@ -32,6 +32,22 @@ interface PokeSpeciesResponse {
   evolution_chain?: { url?: string }
 }
 
+interface PokemonProgressResponse {
+  ok?: boolean
+  progress?: {
+    currentName: string
+    scaledStats: {
+      hp: number
+      attack: number
+      defense: number
+      speed: number
+      spAttack: number
+      spDefense: number
+    }
+    rebirthLevel: number
+  } | null
+}
+
 const fetchJson = async <T>(url: string | null | undefined): Promise<T | null> => {
   if (!url) return null
 
@@ -86,7 +102,7 @@ export async function fetchPokemon(id: number): Promise<Pokemon> {
   const isLegendary = Boolean(species?.is_legendary)
   const isMythical = Boolean(species?.is_mythical)
 
-  return {
+  const mapped: Pokemon = {
     id: data?.id ?? id,
     name: data?.name ?? 'unknown',
     image: mapImage(data),
@@ -104,5 +120,35 @@ export async function fetchPokemon(id: number): Promise<Pokemon> {
     isGold: isLegendary || isMythical,
     isLegendary,
     isMythical,
+  }
+
+  const progress = await fetchJson<PokemonProgressResponse>(
+    `/api/pokemon-progress/${encodeURIComponent(mapped.id)}`,
+  )
+  const snapshot = progress?.ok ? progress.progress : null
+
+  if (!snapshot)
+    return {
+      rebirthLevel: 0,
+      ...mapped,
+    }
+
+  return {
+    rebirthLevel: snapshot.rebirthLevel,
+    ...mapped,
+    name: snapshot.currentName || mapped.name,
+    stats: {
+      ...mapped.stats,
+      hp: snapshot.scaledStats.hp,
+      attack: snapshot.scaledStats.attack,
+      defense: snapshot.scaledStats.defense,
+      speed: snapshot.scaledStats.speed,
+      'special-attack': snapshot.scaledStats.spAttack,
+      'special-defense': snapshot.scaledStats.spDefense,
+    },
+    baseExp: Math.max(
+      mapped.baseExp,
+      Math.round(mapped.baseExp * (1 + snapshot.rebirthLevel * 0.1)),
+    ),
   }
 }

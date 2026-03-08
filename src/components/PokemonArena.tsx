@@ -32,6 +32,10 @@ export default function PokemonArena() {
     needsOpponent,
     weather,
     impactSide,
+    activeStatus,
+    playerTactics,
+    playerAttackZone,
+    playerBlockZone,
     msLeft,
     canPrepare,
     canLoadOpponent,
@@ -39,6 +43,8 @@ export default function PokemonArena() {
     canUseAbility,
     playerAbilities,
     playerCooldowns,
+    setPlayerAttackZone,
+    setPlayerBlockZone,
     prepareBattle,
     loadOpponent,
     startBattle,
@@ -127,7 +133,7 @@ export default function PokemonArena() {
         challenger={challenger}
         champHp={champHp}
         challengerHp={challengerHp}
-        activeStatus={{ champ: null, opp: null }}
+        activeStatus={activeStatus}
         combo={{ champ: 0, opp: 0 }}
         rage={{ champ: Math.round((msLeft / 2500) * 100), opp: 0 }}
         berserk={{ champ: 0, opp: 0 }}
@@ -199,9 +205,14 @@ export default function PokemonArena() {
             <BattleControls
               abilities={playerAbilities}
               cooldowns={playerCooldowns}
+              tactics={playerTactics}
               canUseAbility={canUseAbility}
               msLeft={msLeft}
               windowMs={2500}
+              attackZone={playerAttackZone}
+              blockZone={playerBlockZone}
+              onSetAttackZone={setPlayerAttackZone}
+              onSetBlockZone={setPlayerBlockZone}
               onUseAbility={id => {
                 void triggerAbility(id)
               }}

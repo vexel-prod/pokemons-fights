@@ -130,6 +130,7 @@ export default function PokemonCard({ pokemon }: PokemonCardProps) {
               </h2>
 
               <span className='pokemon-id-pill'>#{String(pokemon.id).padStart(3, '0')}</span>
+              <span className='pokemon-rebirth-pill'>GEN {pokemon.rebirthLevel}</span>
             </div>
             <div className='flex flex-col gap-1'>
               {(pokemon.types ?? []).map(type => (
