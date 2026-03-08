@@ -34,7 +34,8 @@ export function BattleControls({
           const disabled = !canUseAbility || cooldown > 0
           return (
             <button
-              key={`${ability.id}-${index}`}
+              // key={`${ability.id}-${index}`}
+              key={index}
               className='ability-btn'
               disabled={disabled}
               onClick={() => onUseAbility(ability.id)}

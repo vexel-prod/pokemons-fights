@@ -119,7 +119,6 @@ export default function PokemonArena() {
       >
         <div className='arena-bg-image-layer' />
         <div className='arena-glow' />
-        <div className='arena-grid' />
         <div className='arena-particles' />
       </div>
 
